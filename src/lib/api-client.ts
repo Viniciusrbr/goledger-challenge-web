@@ -9,14 +9,33 @@ const buildHeaders = (): HeadersInit => ({
   Authorization: getAuthHeader(),
 });
 
-export const apiPost = async <T>(
+/** Server-side fetch needs an absolute URL so Next rewrites proxy to the GoLedger API. */
+const resolveFetchUrl = (endpoint: string): string => {
+  if (endpoint.startsWith("http://") || endpoint.startsWith("https://")) {
+    return endpoint;
+  }
+  if (typeof window === "undefined") {
+    const base = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ?? "";
+    if (base) {
+      return `${base}${endpoint}`;
+    }
+  }
+  return endpoint;
+};
+
+const serverFetchInit = (): Pick<RequestInit, "cache"> | undefined =>
+  typeof window === "undefined" ? { cache: "no-store" } : undefined;
+
+const apiFetch = async (
+  method: string,
   endpoint: string,
   body: unknown,
-): Promise<T> => {
-  const res = await fetch(endpoint, {
-    method: "POST",
+): Promise<Response> => {
+  const res = await fetch(resolveFetchUrl(endpoint), {
+    method,
     headers: buildHeaders(),
     body: JSON.stringify(body),
+    ...serverFetchInit(),
   });
 
   if (!res.ok) {
@@ -24,41 +43,18 @@ export const apiPost = async <T>(
     throw new Error(error.error ?? `Request failed: ${res.status}`);
   }
 
-  return res.json();
+  return res;
 };
 
-export const apiPut = async <T>(
-  endpoint: string,
-  body: unknown,
-): Promise<T> => {
-  const res = await fetch(endpoint, {
-    method: "PUT",
-    headers: buildHeaders(),
-    body: JSON.stringify(body),
-  });
+export const apiPost = async <T>(endpoint: string, body: unknown): Promise<T> =>
+  (await apiFetch("POST", endpoint, body)).json();
 
-  if (!res.ok) {
-    const error = await res.json().catch(() => ({ error: res.statusText }));
-    throw new Error(error.error ?? `Request failed: ${res.status}`);
-  }
-
-  return res.json();
-};
+export const apiPut = async <T>(endpoint: string, body: unknown): Promise<T> =>
+  (await apiFetch("PUT", endpoint, body)).json();
 
 export const apiDelete = async (
   endpoint: string,
   body: unknown,
 ): Promise<void> => {
-  const res = await fetch(endpoint, {
-    method: "DELETE",
-    headers: buildHeaders(),
-    body: JSON.stringify(body),
-  });
-
-  if (!res.ok) {
-    const error = await res.json().catch(() => ({ error: res.statusText }));
-    throw new Error(error.error ?? `Request failed: ${res.status}`);
-  }
-
-  await res.json().catch(() => null);
+  await apiFetch("DELETE", endpoint, body);
 };
