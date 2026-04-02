@@ -1,19 +1,19 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { ApiSeasonRepository } from "@/infra/repositories/api-season.repository";
 import {
-  createSeasonSchema,
   type CreateSeasonDTO,
+  createSeasonSchema,
 } from "@/core/application/seasons/create-season.dto";
-import {
-  updateSeasonSchema,
-  type UpdateSeasonDTO,
-} from "@/core/application/seasons/update-season.dto";
 import { CreateSeasonUseCase } from "@/core/application/seasons/create-season.use-case";
-import { UpdateSeasonUseCase } from "@/core/application/seasons/update-season.use-case";
 import { DeleteSeasonUseCase } from "@/core/application/seasons/delete-season.use-case";
 import { SearchSeasonsUseCase } from "@/core/application/seasons/search-seasons.use-case";
+import {
+  type UpdateSeasonDTO,
+  updateSeasonSchema,
+} from "@/core/application/seasons/update-season.dto";
+import { UpdateSeasonUseCase } from "@/core/application/seasons/update-season.use-case";
+import { ApiSeasonRepository } from "@/infra/repositories/api-season.repository";
 
 type ActionResult = {
   success: boolean;
