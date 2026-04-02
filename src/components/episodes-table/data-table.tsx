@@ -45,9 +45,16 @@ interface DataTableProps {
   data: Episode[];
   seasons: Season[];
   tvShows: TVShow[];
+  seasonMap: Record<string, string>;
 }
 
-export function DataTable({ columns, data, seasons, tvShows }: DataTableProps) {
+export function DataTable({
+  columns,
+  data,
+  seasons,
+  tvShows,
+  seasonMap,
+}: DataTableProps) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [filterTVShow, setFilterTVShow] = useState("");
 
@@ -63,10 +70,6 @@ export function DataTable({ columns, data, seasons, tvShows }: DataTableProps) {
     initialState: { pagination: { pageSize: 10 } },
     columnResizeMode: undefined,
   });
-
-  const seasonMap = Object.fromEntries(
-    seasons.map((s) => [s["@key"], `Season ${s.number} (${s.year})`]),
-  );
 
   const seasonsForSelected = filterTVShow
     ? seasons.filter((s) => s.tvShow["@key"] === filterTVShow)
@@ -116,7 +119,6 @@ export function DataTable({ columns, data, seasons, tvShows }: DataTableProps) {
 
   return (
     <div className="space-y-4">
-      {/* Hierarchical filter: TV Show → Season */}
       <div className="flex flex-wrap items-center gap-3">
         <div className="flex items-center gap-2">
           <span className="text-sm text-muted-foreground whitespace-nowrap">

@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -43,8 +43,9 @@ export function WatchlistClient({ watchlists, tvShows }: Props) {
   const [editingKey, setEditingKey] = useState<string | null>(null);
   const [selectedShows, setSelectedShows] = useState<string[]>([]);
 
-  const tvShowMap = Object.fromEntries(
-    tvShows.map((s) => [s["@key"], s.title]),
+  const tvShowMap = useMemo(
+    () => Object.fromEntries(tvShows.map((s) => [s["@key"], s.title])),
+    [tvShows],
   );
 
   const createForm = useForm<CreateFormData>({
