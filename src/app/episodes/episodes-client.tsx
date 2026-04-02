@@ -27,6 +27,7 @@ import {
 import type { Episode } from "@/core/domain/episodes/episode.entity";
 import type { Season } from "@/core/domain/seasons/season.entity";
 import type { TVShow } from "@/core/domain/tv-shows/tv-show.entity";
+import { fromRFC3339, toRFC3339 } from "@/lib/date";
 
 const createSchema = z.object({
   episodeNumber: z.number().int().min(1, "Episode number must be at least 1"),
@@ -57,15 +58,24 @@ export function EpisodesClient({ episodes, seasons, tvShows }: Props) {
   const router = useRouter();
   const [showForm, setShowForm] = useState(false);
   const [editingKey, setEditingKey] = useState<string | null>(null);
-  const [editingEpisode, setEditingEpisode] = useState<Episode | null>(null);
   const [formTVShow, setFormTVShow] = useState("");
 
-  const seasonMap = Object.fromEntries(
-    seasons.map((s) => [s["@key"], `Season ${s.number} (${s.year})`]),
+  const editingEpisode = useMemo(
+    () => episodes.find((e) => e["@key"] === editingKey) ?? null,
+    [episodes, editingKey],
   );
 
-  const tvShowMap = Object.fromEntries(
-    tvShows.map((s) => [s["@key"], s.title]),
+  const seasonMap = useMemo(
+    () =>
+      Object.fromEntries(
+        seasons.map((s) => [s["@key"], `Season ${s.number} (${s.year})`]),
+      ),
+    [seasons],
+  );
+
+  const tvShowMap = useMemo(
+    () => Object.fromEntries(tvShows.map((s) => [s["@key"], s.title])),
+    [tvShows],
   );
 
   const seasonsForForm = useMemo(() => {
@@ -100,7 +110,7 @@ export function EpisodesClient({ episodes, seasons, tvShows }: Props) {
       episodeNumber: data.episodeNumber,
       season: { "@assetType": "seasons", "@key": data.seasonKey },
       title: data.title,
-      releaseDate: `${data.releaseDate}T00:00:00Z`,
+      releaseDate: toRFC3339(data.releaseDate),
       description: data.description,
       rating: data.rating,
     });
@@ -120,7 +130,7 @@ export function EpisodesClient({ episodes, seasons, tvShows }: Props) {
     const result = await updateEpisodeAction({
       key: editingKey,
       title: data.title,
-      releaseDate: `${data.releaseDate}T00:00:00Z`,
+      releaseDate: toRFC3339(data.releaseDate),
       description: data.description,
       rating: data.rating,
     });
@@ -128,7 +138,6 @@ export function EpisodesClient({ episodes, seasons, tvShows }: Props) {
       toast.success(result.message);
       setShowForm(false);
       setEditingKey(null);
-      setEditingEpisode(null);
       updateForm.reset();
       router.refresh();
     } else {
@@ -148,10 +157,9 @@ export function EpisodesClient({ episodes, seasons, tvShows }: Props) {
 
   const startEdit = (episode: Episode) => {
     setEditingKey(episode["@key"]);
-    setEditingEpisode(episode);
     updateForm.reset({
       title: episode.title,
-      releaseDate: episode.releaseDate.split("T")[0],
+      releaseDate: fromRFC3339(episode.releaseDate),
       description: episode.description,
       rating: episode.rating ?? undefined,
     });
@@ -161,7 +169,6 @@ export function EpisodesClient({ episodes, seasons, tvShows }: Props) {
   const cancelForm = () => {
     setShowForm(false);
     setEditingKey(null);
-    setEditingEpisode(null);
     setFormTVShow("");
     createForm.reset();
     updateForm.reset();
@@ -398,6 +405,7 @@ export function EpisodesClient({ episodes, seasons, tvShows }: Props) {
         data={episodes}
         seasons={seasons}
         tvShows={tvShows}
+        seasonMap={seasonMap}
       />
     </main>
   );

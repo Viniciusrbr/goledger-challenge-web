@@ -4,6 +4,7 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { DeleteDialog } from "@/components/delete-dialog";
 import { Button } from "@/components/ui/button";
 import type { Episode } from "@/core/domain/episodes/episode.entity";
+import { displayDate } from "@/lib/date";
 
 export function createColumns(
   seasonMap: Record<string, string>,
@@ -41,7 +42,7 @@ export function createColumns(
       header: "Release Date",
       cell: ({ row }) => (
         <span className="text-muted-foreground">
-          {row.getValue("releaseDate")}
+          {displayDate(row.getValue("releaseDate"))}
         </span>
       ),
       enableSorting: false,
