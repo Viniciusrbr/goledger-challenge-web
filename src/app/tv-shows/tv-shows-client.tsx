@@ -12,10 +12,10 @@ import {
   deleteTVShowAction,
   updateTVShowAction,
 } from "@/app/actions/tv-show.actions";
-import { FormField } from "@/components/form-field";
 import { createColumns } from "@/components/tv-shows-table/columns";
 import { DataTable } from "@/components/tv-shows-table/data-table";
 import { Button } from "@/components/ui/button";
+import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import type { TVShow } from "@/core/domain/tv-shows/tv-show.entity";
 
@@ -130,19 +130,16 @@ export function TVShowsClient({ tvShows }: { tvShows: TVShow[] }) {
         >
           <h2 className="font-medium">New TV Show</h2>
           <div className="grid gap-3 sm:grid-cols-2">
-            <FormField
-              label="Title"
-              error={createForm.formState.errors.title?.message}
-            >
+            <Field>
+              <FieldLabel>Title</FieldLabel>
               <Input
-                placeholder="Title of the TV show"
+                placeholder="Breaking Bad"
                 {...createForm.register("title")}
               />
-            </FormField>
-            <FormField
-              label="Recommended Age"
-              error={createForm.formState.errors.recommendedAge?.message}
-            >
+              <FieldError errors={[createForm.formState.errors.title]} />
+            </Field>
+            <Field>
+              <FieldLabel>Recommended Age</FieldLabel>
               <Input
                 type="number"
                 min={0}
@@ -151,17 +148,21 @@ export function TVShowsClient({ tvShows }: { tvShows: TVShow[] }) {
                   valueAsNumber: true,
                 })}
               />
-            </FormField>
+              <FieldError
+                errors={[createForm.formState.errors.recommendedAge]}
+              />
+            </Field>
             <div className="sm:col-span-2">
-              <FormField
-                label="Description"
-                error={createForm.formState.errors.description?.message}
-              >
+              <Field>
+                <FieldLabel>Description</FieldLabel>
                 <Input
-                  placeholder="Description of the TV show"
+                  placeholder="A chemistry teacher turned drug lord..."
                   {...createForm.register("description")}
                 />
-              </FormField>
+                <FieldError
+                  errors={[createForm.formState.errors.description]}
+                />
+              </Field>
             </div>
           </div>
           <div className="flex gap-2">
@@ -182,10 +183,8 @@ export function TVShowsClient({ tvShows }: { tvShows: TVShow[] }) {
         >
           <h2 className="font-medium">Edit TV Show</h2>
           <div className="grid gap-3 sm:grid-cols-2">
-            <FormField
-              label="Recommended Age"
-              error={updateForm.formState.errors.recommendedAge?.message}
-            >
+            <Field>
+              <FieldLabel>Recommended Age</FieldLabel>
               <Input
                 type="number"
                 min={0}
@@ -194,17 +193,21 @@ export function TVShowsClient({ tvShows }: { tvShows: TVShow[] }) {
                   valueAsNumber: true,
                 })}
               />
-            </FormField>
+              <FieldError
+                errors={[updateForm.formState.errors.recommendedAge]}
+              />
+            </Field>
             <div className="sm:col-span-2">
-              <FormField
-                label="Description"
-                error={updateForm.formState.errors.description?.message}
-              >
+              <Field>
+                <FieldLabel>Description</FieldLabel>
                 <Input
                   placeholder="A chemistry teacher turned drug lord..."
                   {...updateForm.register("description")}
                 />
-              </FormField>
+                <FieldError
+                  errors={[updateForm.formState.errors.description]}
+                />
+              </Field>
             </div>
           </div>
           <div className="flex gap-2">
