@@ -1,19 +1,19 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { ApiWatchlistRepository } from "@/infra/repositories/api-watchlist.repository";
 import {
-  createWatchlistSchema,
   type CreateWatchlistDTO,
+  createWatchlistSchema,
 } from "@/core/application/watchlist/create-watchlist.dto";
-import {
-  updateWatchlistSchema,
-  type UpdateWatchlistDTO,
-} from "@/core/application/watchlist/update-watchlist.dto";
 import { CreateWatchlistUseCase } from "@/core/application/watchlist/create-watchlist.use-case";
-import { UpdateWatchlistUseCase } from "@/core/application/watchlist/update-watchlist.use-case";
 import { DeleteWatchlistUseCase } from "@/core/application/watchlist/delete-watchlist.use-case";
 import { SearchWatchlistsUseCase } from "@/core/application/watchlist/search-watchlists.use-case";
+import {
+  type UpdateWatchlistDTO,
+  updateWatchlistSchema,
+} from "@/core/application/watchlist/update-watchlist.dto";
+import { UpdateWatchlistUseCase } from "@/core/application/watchlist/update-watchlist.use-case";
+import { ApiWatchlistRepository } from "@/infra/repositories/api-watchlist.repository";
 
 type ActionResult = {
   success: boolean;

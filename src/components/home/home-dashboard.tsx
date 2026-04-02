@@ -20,35 +20,35 @@ const sections: {
   icon: ComponentType<{ className?: string }>;
   assetType: AssetType;
 }[] = [
-    {
-      href: "/tv-shows",
-      title: "TV Shows",
-      description: "Catalogue series: create, edit, search and remove shows.",
-      icon: Tv,
-      assetType: "tvShows",
-    },
-    {
-      href: "/seasons",
-      title: "Seasons",
-      description: "Manage seasons linked to each show.",
-      icon: Layers,
-      assetType: "seasons",
-    },
-    {
-      href: "/episodes",
-      title: "Episodes",
-      description: "List and maintain episodes per season.",
-      icon: Clapperboard,
-      assetType: "episodes",
-    },
-    {
-      href: "/watchlist",
-      title: "Watchlists",
-      description: "Register and edit watchlists of TV shows.",
-      icon: Bookmark,
-      assetType: "watchlist",
-    },
-  ];
+  {
+    href: "/tv-shows",
+    title: "TV Shows",
+    description: "Catalogue series: create, edit, search and remove shows.",
+    icon: Tv,
+    assetType: "tvShows",
+  },
+  {
+    href: "/seasons",
+    title: "Seasons",
+    description: "Manage seasons linked to each show.",
+    icon: Layers,
+    assetType: "seasons",
+  },
+  {
+    href: "/episodes",
+    title: "Episodes",
+    description: "List and maintain episodes per season.",
+    icon: Clapperboard,
+    assetType: "episodes",
+  },
+  {
+    href: "/watchlist",
+    title: "Watchlists",
+    description: "Register and edit watchlists of TV shows.",
+    icon: Bookmark,
+    assetType: "watchlist",
+  },
+];
 
 export const HomeDashboard = async () => {
   const results = await Promise.allSettled(
