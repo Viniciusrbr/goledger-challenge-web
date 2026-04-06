@@ -95,7 +95,3 @@ npm start
 ## Contexto original do desafio
 
 Fork do repositório oficial: [goledgerdev/goledger-challenge-web](https://github.com/goledgerdev/goledger-challenge-web).
-
-Requisitos do desafio: CRUD completo para **tv shows**, **seasons**, **episodes** e **watchlists**; uso de **React** ou **Next.js**; UI clara e funcional.
-
-Para concluir a entrega, envie o link do repositório (fork) com o código e **instruções para executar** — como as descritas acima.
