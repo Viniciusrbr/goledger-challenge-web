@@ -5,7 +5,7 @@ import type {
 } from "@/core/domain/episodes/episode.entity";
 import type { EpisodeRepository } from "@/core/domain/episodes/episode.repository";
 import type { SearchResult } from "@/core/domain/shared.types";
-import { apiDelete, apiPost, apiPut } from "@/lib/api-client";
+import { apiDelete, apiPost } from "@/lib/api-client";
 
 const ASSET_TYPE = "episodes";
 
@@ -30,7 +30,7 @@ export class ApiEpisodeRepository implements EpisodeRepository {
   }
 
   async update(key: string, data: UpdateEpisodeInput): Promise<Episode> {
-    return apiPut<Episode>("/api/invoke/updateAsset", {
+    return apiPost<Episode>("/api/invoke/updateAsset", {
       update: { "@assetType": ASSET_TYPE, "@key": key, ...data },
     });
   }

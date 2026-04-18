@@ -1,6 +1,6 @@
 const getAuthHeader = (): string => {
-  const user = process.env.NEXT_PUBLIC_API_USER ?? "";
-  const pass = process.env.NEXT_PUBLIC_API_PASS ?? "";
+  const user = process.env.API_USER ?? "";
+  const pass = process.env.API_PASS ?? "";
   return `Basic ${btoa(`${user}:${pass}`)}`;
 };
 
@@ -48,9 +48,6 @@ const apiFetch = async (
 
 export const apiPost = async <T>(endpoint: string, body: unknown): Promise<T> =>
   (await apiFetch("POST", endpoint, body)).json();
-
-export const apiPut = async <T>(endpoint: string, body: unknown): Promise<T> =>
-  (await apiFetch("PUT", endpoint, body)).json();
 
 export const apiDelete = async (
   endpoint: string,

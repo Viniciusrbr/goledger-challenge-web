@@ -5,7 +5,7 @@ import type {
   Watchlist,
 } from "@/core/domain/watchlist/watchlist.entity";
 import type { WatchlistRepository } from "@/core/domain/watchlist/watchlist.repository";
-import { apiDelete, apiPost, apiPut } from "@/lib/api-client";
+import { apiDelete, apiPost } from "@/lib/api-client";
 
 const ASSET_TYPE = "watchlist";
 
@@ -30,7 +30,7 @@ export class ApiWatchlistRepository implements WatchlistRepository {
   }
 
   async update(key: string, data: UpdateWatchlistInput): Promise<Watchlist> {
-    return apiPut<Watchlist>("/api/invoke/updateAsset", {
+    return apiPost<Watchlist>("/api/invoke/updateAsset", {
       update: { "@assetType": ASSET_TYPE, "@key": key, ...data },
     });
   }

@@ -5,7 +5,7 @@ import type {
   UpdateTVShowInput,
 } from "@/core/domain/tv-shows/tv-show.entity";
 import type { TVShowRepository } from "@/core/domain/tv-shows/tv-show.repository";
-import { apiDelete, apiPost, apiPut } from "@/lib/api-client";
+import { apiDelete, apiPost } from "@/lib/api-client";
 
 const ASSET_TYPE = "tvShows";
 
@@ -30,7 +30,7 @@ export class ApiTVShowRepository implements TVShowRepository {
   }
 
   async update(key: string, data: UpdateTVShowInput): Promise<TVShow> {
-    return apiPut<TVShow>("/api/invoke/updateAsset", {
+    return apiPost<TVShow>("/api/invoke/updateAsset", {
       update: { "@assetType": ASSET_TYPE, "@key": key, ...data },
     });
   }
