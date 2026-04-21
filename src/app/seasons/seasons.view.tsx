@@ -1,18 +1,7 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
-import { toast } from "sonner";
-import { z } from "zod";
-import {
-  createSeasonAction,
-  deleteSeasonAction,
-  updateSeasonAction,
-} from "@/app/actions/season.actions";
-import { createColumns } from "@/components/seasons-table/columns";
+import { Controller } from "react-hook-form";
 import { DataTable } from "@/components/seasons-table/data-table";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
@@ -24,105 +13,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { Season } from "@/core/domain/seasons/season.entity";
-import type { TVShow } from "@/core/domain/tv-shows/tv-show.entity";
+import { useSeasonsModel } from "./seasons.model";
+import type { SeasonsProps } from "./seasons.type";
 
-const createSchema = z.object({
-  number: z.number().int().min(1, "Season number must be at least 1"),
-  tvShowKey: z.string().min(1, "TV Show is required"),
-  year: z.number().int().min(1900, "Year must be 1900 or later"),
-});
-
-const updateSchema = z.object({
-  year: z.number().int().min(1900, "Year must be 1900 or later"),
-});
-
-type CreateFormData = z.infer<typeof createSchema>;
-type UpdateFormData = z.infer<typeof updateSchema>;
-
-type Props = {
-  seasons: Season[];
-  tvShows: TVShow[];
-};
-
-export function SeasonsClient({ seasons, tvShows }: Props) {
-  const router = useRouter();
-  const [showForm, setShowForm] = useState(false);
-  const [editingKey, setEditingKey] = useState<string | null>(null);
-
-  const tvShowMap = useMemo(
-    () => Object.fromEntries(tvShows.map((s) => [s["@key"], s.title])),
-    [tvShows],
-  );
-
-  const createForm = useForm<CreateFormData>({
-    resolver: zodResolver(createSchema),
-    defaultValues: { number: 1, tvShowKey: "", year: new Date().getFullYear() },
-  });
-
-  const updateForm = useForm<UpdateFormData>({
-    resolver: zodResolver(updateSchema),
-    defaultValues: { year: new Date().getFullYear() },
-  });
-
-  const onCreateSubmit = async (data: CreateFormData) => {
-    const result = await createSeasonAction({
-      number: data.number,
-      tvShow: { "@assetType": "tvShows", "@key": data.tvShowKey },
-      year: data.year,
-    });
-    if (result.success) {
-      toast.success(result.message);
-      setShowForm(false);
-      createForm.reset();
-      router.refresh();
-    } else {
-      toast.error(result.message);
-    }
-  };
-
-  const onUpdateSubmit = async (data: UpdateFormData) => {
-    if (!editingKey) return;
-    const result = await updateSeasonAction({
-      key: editingKey,
-      year: data.year,
-    });
-    if (result.success) {
-      toast.success(result.message);
-      setShowForm(false);
-      setEditingKey(null);
-      updateForm.reset();
-      router.refresh();
-    } else {
-      toast.error(result.message);
-    }
-  };
-
-  const handleDelete = async (key: string) => {
-    const result = await deleteSeasonAction(key);
-    if (result.success) {
-      toast.success(result.message);
-      router.refresh();
-    } else {
-      toast.error(result.message);
-    }
-  };
-
-  const startEdit = (season: Season) => {
-    setEditingKey(season["@key"]);
-    updateForm.reset({ year: season.year });
-    setShowForm(true);
-  };
-
-  const cancelForm = () => {
-    setShowForm(false);
-    setEditingKey(null);
-    createForm.reset();
-    updateForm.reset();
-  };
-
-  const columns = createColumns(tvShowMap, startEdit, handleDelete);
-  const isEditing = !!editingKey;
+export function SeasonsView({ seasons, tvShows }: SeasonsProps) {
+  const {
+    showForm,
+    isEditing,
+    setShowForm,
+    createForm,
+    updateForm,
+    onCreateSubmit,
+    onUpdateSubmit,
+    cancelForm,
+    columns,
+  } = useSeasonsModel({ tvShows });
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-10 md:px-6 space-y-6">

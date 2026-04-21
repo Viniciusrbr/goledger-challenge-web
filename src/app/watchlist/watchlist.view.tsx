@@ -1,138 +1,28 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
-import { useForm } from "react-hook-form";
-import { toast } from "sonner";
-import { z } from "zod";
-import {
-  createWatchlistAction,
-  deleteWatchlistAction,
-  updateWatchlistAction,
-} from "@/app/actions/watchlist.actions";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { createColumns } from "@/components/watchlist-table/columns";
 import { DataTable } from "@/components/watchlist-table/data-table";
-import type { TVShow } from "@/core/domain/tv-shows/tv-show.entity";
-import type { Watchlist } from "@/core/domain/watchlist/watchlist.entity";
+import { useWatchlistModel } from "./watchlist.model";
+import type { WatchlistProps } from "./watchlist.type";
 
-const createSchema = z.object({
-  title: z.string().min(1, "Title is required"),
-  description: z.string().optional(),
-});
-
-const updateSchema = z.object({
-  description: z.string().optional(),
-});
-
-type CreateFormData = z.infer<typeof createSchema>;
-type UpdateFormData = z.infer<typeof updateSchema>;
-
-type Props = {
-  watchlists: Watchlist[];
-  tvShows: TVShow[];
-};
-
-export function WatchlistClient({ watchlists, tvShows }: Props) {
-  const router = useRouter();
-  const [showForm, setShowForm] = useState(false);
-  const [editingKey, setEditingKey] = useState<string | null>(null);
-  const [selectedShows, setSelectedShows] = useState<string[]>([]);
-
-  const tvShowMap = useMemo(
-    () => Object.fromEntries(tvShows.map((s) => [s["@key"], s.title])),
-    [tvShows],
-  );
-
-  const createForm = useForm<CreateFormData>({
-    resolver: zodResolver(createSchema),
-    defaultValues: { title: "", description: "" },
-  });
-
-  const updateForm = useForm<UpdateFormData>({
-    resolver: zodResolver(updateSchema),
-    defaultValues: { description: "" },
-  });
-
-  const toggleShow = (key: string) => {
-    setSelectedShows((prev) =>
-      prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key],
-    );
-  };
-
-  const onCreateSubmit = async (data: CreateFormData) => {
-    const result = await createWatchlistAction({
-      title: data.title,
-      description: data.description || undefined,
-      tvShows: selectedShows.map((key) => ({
-        "@assetType": "tvShows" as const,
-        "@key": key,
-      })),
-    });
-    if (result.success) {
-      toast.success(result.message);
-      setShowForm(false);
-      createForm.reset();
-      setSelectedShows([]);
-      router.refresh();
-    } else {
-      toast.error(result.message);
-    }
-  };
-
-  const onUpdateSubmit = async (data: UpdateFormData) => {
-    if (!editingKey) return;
-    const result = await updateWatchlistAction({
-      key: editingKey,
-      description: data.description || undefined,
-      tvShows: selectedShows.map((key) => ({
-        "@assetType": "tvShows" as const,
-        "@key": key,
-      })),
-    });
-    if (result.success) {
-      toast.success(result.message);
-      setShowForm(false);
-      setEditingKey(null);
-      updateForm.reset();
-      setSelectedShows([]);
-      router.refresh();
-    } else {
-      toast.error(result.message);
-    }
-  };
-
-  const handleDelete = async (key: string) => {
-    const result = await deleteWatchlistAction(key);
-    if (result.success) {
-      toast.success(result.message);
-      router.refresh();
-    } else {
-      toast.error(result.message);
-    }
-  };
-
-  const startEdit = (watchlist: Watchlist) => {
-    setEditingKey(watchlist["@key"]);
-    updateForm.reset({ description: watchlist.description ?? "" });
-    setSelectedShows(watchlist.tvShows?.map((s) => s["@key"]) ?? []);
-    setShowForm(true);
-  };
-
-  const cancelForm = () => {
-    setShowForm(false);
-    setEditingKey(null);
-    createForm.reset();
-    updateForm.reset();
-    setSelectedShows([]);
-  };
-
-  const columns = createColumns(startEdit, handleDelete);
-  const isEditing = !!editingKey;
+export function WatchlistView({ watchlists, tvShows }: WatchlistProps) {
+  const {
+    showForm,
+    isEditing,
+    setShowForm,
+    createForm,
+    updateForm,
+    onCreateSubmit,
+    onUpdateSubmit,
+    cancelForm,
+    toggleShow,
+    selectedShows,
+    tvShowMap,
+    columns,
+  } = useWatchlistModel({ tvShows });
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-10 md:px-6 space-y-6">
